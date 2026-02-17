@@ -1,20 +1,97 @@
 ---
-name: visual-explainer
-description: Generate beautiful, self-contained HTML pages that visually explain systems, code changes, plans, and data. Use when the user asks for a diagram, architecture overview, diff review, plan review, project recap, comparison table, or any visual explanation of technical concepts. Also use proactively when you are about to render a complex ASCII table (4+ rows or 3+ columns) — present it as a styled HTML page instead.
+name: stitch-visual-explainer
+description: "Stitch companion: analyze exported screen designs to generate interactive flow diagrams, architecture maps, and prioritized agent task lists. Also generates beautiful HTML pages for any technical diagram, code review, or data table. Based on visual-explainer by @nicobailon."
 license: MIT
 compatibility: Requires a browser to view generated HTML files. Optional surf-cli for AI image generation.
 metadata:
-  author: nicobailon
-  version: "0.1.0"
+  author: KewkLW
+  upstream: nicobailon/visual-explainer
+  version: "0.2.0"
 ---
 
-# Visual Explainer
+# Stitch Visual Explainer
 
-Generate self-contained HTML files for technical diagrams, visualizations, and data tables. Always open the result in the browser. Never fall back to ASCII art when this skill is loaded.
+> Based on [visual-explainer](https://github.com/nicobailon/visual-explainer) by [@nicobailon](https://github.com/nicobailon). This fork adds Stitch export analysis and agent task generation.
+
+Generate self-contained HTML files for technical diagrams, visualizations, and data tables. When pointed at a Stitch export, analyze all screens and produce flow diagrams with prioritized agent task lists. Always open the result in the browser. Never fall back to ASCII art when this skill is loaded.
 
 **Proactive table rendering.** When you're about to present tabular data as an ASCII box-drawing table in the terminal (comparisons, audits, feature matrices, status reports, any structured rows/columns), generate an HTML page instead. The threshold: if the table has 4+ rows or 3+ columns, it belongs in the browser. Don't wait for the user to ask — render it as HTML automatically and tell them the file path. You can still include a brief text summary in the chat, but the table itself should be the HTML page.
 
-## Workflow
+## Stitch Export Analysis
+
+When pointed at a Stitch export directory (a folder containing screen subdirectories, each with `code.html` and `screen.png`), follow this workflow:
+
+### 1. Scan the Export
+
+- List all subdirectories in the export folder
+- Read `code.html` from key screens to understand: page titles, navigation patterns, UI components, design tokens (colors, fonts, Tailwind config), auth methods, data models
+- Extract the bottom nav / tab bar structure to understand the app's primary navigation
+- Count total screens
+
+### 2. Classify Screens into Domains
+
+Group screens by function. Common domain patterns:
+- **Auth**: login, signup, onboarding, terms, password reset
+- **Home / Dashboard**: main hub, overview, command center
+- **Core Feature A**: the primary activity (workout, task creation, content editing, etc.)
+- **Core Feature B**: secondary activity (nutrition, messaging, analytics, etc.)
+- **Programs / Content**: libraries, catalogs, builders, detail views
+- **Analytics / Stats**: trends, charts, reports, body stats
+- **Recovery / Wellness**: breathing, meditation, sleep, recovery
+- **Settings**: preferences, privacy, theme, account, data export/import
+- **Monetization**: plans, upgrades, pricing, ad gates
+- **Admin**: debug panels, moderation queues, internal tools
+- **Placeholder**: "coming soon" screens
+
+Assign each domain a distinct color for the flow diagrams.
+
+### 3. Generate the Output
+
+Produce a multi-section HTML page containing:
+
+1. **KPI overview** — Total screens, domain count, nav tab count, coming-soon count
+2. **Auth flow diagram** — Mermaid flowchart showing authentication paths
+3. **Navigation structure** — Bottom nav tabs and what each opens
+4. **Full system flow** — Complete Mermaid diagram of all screens with color-coded domain subgraphs
+5. **Domain breakdown** — Card grid with every screen listed per domain, with folder names as `<code>` references
+6. **Tech stack table** — Extracted from the HTML: framework, fonts, icons, colors, theme mode, layout patterns
+7. **Primary user journey** — The core interaction loop as a Mermaid flowchart
+8. **Prioritized agent task list** — Build roadmap (see Agent Task Lists below)
+
+### 4. Match the App's Aesthetic
+
+Read the Tailwind config and CSS from the screens to extract the app's design language (colors, fonts, effects). Use that same aesthetic for the diagram page itself — if the app is dark with amber accents, the diagram should be too.
+
+## Agent Task Lists
+
+When generating flow diagrams for apps or multi-screen systems, **always include a prioritized build task list**. This is the key output for agent workflows — it turns a visual analysis into actionable work.
+
+**Table format:** Use a styled `<table>` with columns:
+- **Priority** — Color-coded tag (P0–P6)
+- **Task** — Bold title + `<small>` description with enough detail for an agent to start coding
+- **Domain** — Color-coded tag matching the flow diagrams
+- **Screens** — Count of screens this task covers
+- **Dependencies** — What must be built first (reference other tasks)
+
+**Priority tiers:**
+
+| Tier | Color | Meaning | Examples |
+|------|-------|---------|----------|
+| P0 | Red | Foundation — nothing works without this | Design system, app shell, auth, core data models |
+| P1 | Amber | Core loop — the main reason the app exists | Primary feature CRUD, the screen users spend most time on |
+| P2 | Green | Retention — features that drive daily engagement | Secondary features, content creation tools |
+| P3 | Blue | Depth — enriching existing domains | Advanced search, custom items, barcode scanning |
+| P4 | Purple | Polish — analytics, settings, data portability | Trends, preferences, export/import |
+| P5 | Orange | Nice-to-haves — wellness, monetization | Meditation, upgrade flows, ad gates |
+| P6 | Grey | Admin & stubs — ship last | Debug panels, coming-soon placeholders |
+
+**After the table**, include:
+1. A **callout** explaining the build order rationale
+2. A **KPI card row** summarizing each tier (task count + screen count)
+
+**The task descriptions must be specific enough that an AI agent can start implementing from the task alone**, referencing the screen folder names and key UI elements found during analysis.
+
+## General Workflow
 
 ### 1. Think (5 seconds, not 5 minutes)
 
@@ -66,7 +143,7 @@ Vary the choice each time. If the last diagram was dark and technical, make the 
 
 **Mermaid theming:** Always use `theme: 'base'` with custom `themeVariables` so colors match your page palette. Use `look: 'handDrawn'` for sketch aesthetic or `look: 'classic'` for clean lines. Use `layout: 'elk'` for complex graphs (requires the `@mermaid-js/layout-elk` package — see `./references/libraries.md` for the CDN import). Override Mermaid's SVG classes with CSS for pixel-perfect control. See `./references/libraries.md` for full theming guide.
 
-**Mermaid zoom controls:** Always add zoom controls (+/−/reset buttons) to every `.mermaid-wrap` container. Complex diagrams render at small sizes and need zoom to be readable. Include Ctrl/Cmd+scroll zoom on the container. See the zoom controls pattern in `./references/css-patterns.md` and the reference template at `./templates/mermaid-flowchart.html`.
+**Mermaid interaction:** Add a fullscreen toggle button (top-right corner) to every `.mermaid-wrap` container. Mouse scroll directly zooms the diagram (no Ctrl/Cmd modifier needed). Click-and-drag pans when zoomed in. Escape key exits fullscreen. Max zoom: 20x in fullscreen, 8x inline. Do NOT use +/- zoom buttons — the fullscreen + scroll-to-zoom approach is cleaner and more intuitive.
 
 **AI-generated illustrations (optional).** If [surf-cli](https://github.com/nicobailon/surf-cli) is available, you can generate images via Gemini and embed them in the page for creative, illustrative, explanatory, educational, or decorative purposes. Check availability with `which surf`. If available:
 
@@ -221,5 +298,6 @@ Before delivering, verify:
 - **Both themes**: Toggle your OS between light and dark mode. Both should look intentional, not broken.
 - **Information completeness**: Does the diagram actually convey what the user asked for? Pretty but incomplete is a failure.
 - **No overflow**: Resize the browser to different widths. No content should clip or escape its container. Every grid and flex child needs `min-width: 0`. Side-by-side panels need `overflow-wrap: break-word`. Never use `display: flex` on `<li>` for marker characters — it creates anonymous flex items that can't shrink, causing lines with many inline `<code>` badges to overflow. Use absolute positioning for markers instead. See the Overflow Protection section in `./references/css-patterns.md`.
-- **Mermaid zoom controls**: Every `.mermaid-wrap` container must have zoom controls (+/−/reset buttons), Ctrl/Cmd+scroll zoom, and click-and-drag panning. Complex diagrams render too small without them. The cursor should change to `grab` when zoomed in and `grabbing` while dragging. See `./references/css-patterns.md` for the full pattern.
+- **Mermaid interaction**: Every `.mermaid-wrap` container must have a fullscreen toggle button, free scroll-to-zoom (no modifier key), and click-and-drag panning when zoomed. Cursor changes to `grab`/`grabbing`. Max zoom 20x fullscreen, 8x inline. Escape exits fullscreen.
+- **Agent task list**: When diagramming an app or multi-screen system (especially Stitch exports), always include a prioritized build task list (P0–P6) with dependencies, domain tags, and screen counts.
 - **File opens cleanly**: No console errors, no broken font loads, no layout shifts.
