@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Suite — Reference Template</title>
+<!--
+  Reference template for the stitch-visual-explainer skill: test suite visualization.
+  Electric indigo/lime "test lab" palette — distinctly different from terracotta
+  (architecture), teal (mermaid), and rose (data-table) templates.
+  Key patterns demonstrated:
+  - Electric indigo/lime palette (NOT teal, rose, or terracotta)
+  - Diagonal line background + positioned radial indigo glow
+  - Sora (geometric body) + IBM Plex Mono (technical labels)
+  - Test summary KPIs with SVG coverage ring
+  - Coverage heatmap (CSS Grid, density-colored cells)
+  - Test dependency graph (Mermaid flowchart with fullscreen toggle)
+  - Domain test sections (collapsible <details>)
+  - Test case cards with type-colored left borders
+  - Playwright file map table
+  - Run instructions callout
+  - Responsive sidebar TOC (7+ sections)
+  - Staggered animations, both themes, reduced motion respect
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============ THEME (dark-first: test lab aesthetic) ============ */
+  :root {
+    --font-body: 'Sora', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+
+    --bg: #0c0a1a;
+    --surface: #14112a;
+    --surface2: #1c1836;
+    --surface-elevated: #221e40;
+    --border: rgba(255, 255, 255, 0.06);
+    --border-bright: rgba(255, 255, 255, 0.12);
+    --text: #e8e6f0;
+    --text-dim: #8b86a8;
+    --accent: #818cf8;
+    --accent-dim: rgba(129, 140, 248, 0.10);
+    --lime: #a3e635;
+    --lime-dim: rgba(163, 230, 53, 0.10);
+
+    /* Test type colors */
+    --test-nav: #06b6d4;     --test-nav-dim: rgba(6, 182, 212, 0.12);
+    --test-auth: #f43f5e;    --test-auth-dim: rgba(244, 63, 94, 0.12);
+    --test-cmp: #8b5cf6;     --test-cmp-dim: rgba(139, 92, 246, 0.12);
+    --test-int: #0ea5e9;     --test-int-dim: rgba(14, 165, 233, 0.12);
+    --test-frm: #10b981;     --test-frm-dim: rgba(16, 185, 129, 0.12);
+    --test-a11y: #d946ef;    --test-a11y-dim: rgba(217, 70, 239, 0.12);
+    --test-vis: #f97316;     --test-vis-dim: rgba(249, 115, 22, 0.12);
+    --test-e2e: #6366f1;     --test-e2e-dim: rgba(99, 102, 241, 0.12);
+
+    /* Status colors */
+    --pass: #84cc16;   --pass-dim: rgba(132, 204, 22, 0.12);
+    --fail: #ef4444;   --fail-dim: rgba(239, 68, 68, 0.12);
+    --skip: #f59e0b;   --skip-dim: rgba(245, 158, 11, 0.12);
+    --notrun-bg: rgba(255, 255, 255, 0.05);
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f5f3ff;
+      --surface: #ffffff;
+      --surface2: #ede9fe;
+      --surface-elevated: #f5f3ff;
+      --border: rgba(0, 0, 0, 0.07);
+      --border-bright: rgba(0, 0, 0, 0.14);
+      --text: #1e1b4b;
+      --text-dim: #6b66a0;
+      --accent: #6366f1;
+      --accent-dim: rgba(99, 102, 241, 0.08);
+      --lime: #65a30d;
+      --lime-dim: rgba(101, 163, 13, 0.08);
+
+      --test-nav: #0891b2;     --test-nav-dim: rgba(8, 145, 178, 0.08);
+      --test-auth: #e11d48;    --test-auth-dim: rgba(225, 29, 72, 0.08);
+      --test-cmp: #7c3aed;     --test-cmp-dim: rgba(124, 58, 237, 0.08);
+      --test-int: #0284c7;     --test-int-dim: rgba(2, 132, 199, 0.08);
+      --test-frm: #059669;     --test-frm-dim: rgba(5, 150, 105, 0.08);
+      --test-a11y: #c026d3;    --test-a11y-dim: rgba(192, 38, 211, 0.08);
+      --test-vis: #ea580c;     --test-vis-dim: rgba(234, 88, 12, 0.08);
+      --test-e2e: #4f46e5;     --test-e2e-dim: rgba(79, 70, 229, 0.08);
+
+      --pass: #65a30d;   --pass-dim: rgba(101, 163, 13, 0.08);
+      --fail: #dc2626;   --fail-dim: rgba(220, 38, 38, 0.08);
+      --skip: #d97706;   --skip-dim: rgba(217, 119, 6, 0.08);
+      --notrun-bg: rgba(0, 0, 0, 0.04);
+    }
+  }
+
+  /* ============ RESET + BASE ============ */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-wrap: break-word;
+    padding: 40px 32px 80px;
+    /* Diagonal lines + indigo glow */
+    background-image:
+      repeating-linear-gradient(
+        -45deg, transparent, transparent 40px,
+        var(--border) 40px, var(--border) 41px
+      ),
+      radial-gradient(ellipse at 30% 10%, var(--accent-dim) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, var(--lime-dim) 0%, transparent 40%);
+  }
+
+  /* ============ LAYOUT (sidebar TOC + main) ============ */
+  .wrap {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    gap: 0 40px;
+  }
+  .main { min-width: 0; }
+
+  /* ============ TOC — Desktop ============ */
+  .toc {
+    position: sticky;
+    top: 24px;
+    align-self: start;
+    padding: 14px 0;
+    grid-row: 1 / -1;
+    max-height: calc(100dvh - 48px);
+    overflow-y: auto;
+  }
+  .toc::-webkit-scrollbar { width: 3px; }
+  .toc::-webkit-scrollbar-thumb { background: var(--surface-elevated); border-radius: 2px; }
+
+  .toc-title {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    padding: 0 0 10px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .toc a {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 5px 0 5px 10px;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .toc a:hover, .toc a.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+  }
+
+  /* ============ TOC — Mobile ============ */
+  @media (max-width: 900px) {
+    .wrap { grid-template-columns: 1fr; }
+    .toc {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      grid-row: auto;
+      max-height: none;
+      overflow-y: visible;
+      display: flex;
+      gap: 0;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+      margin: 0 -32px 24px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .toc::-webkit-scrollbar { display: none; }
+    .toc-title { display: none; }
+    .toc a {
+      padding: 12px 14px;
+      border-left: none;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      font-size: 11px;
+    }
+    .toc a:hover, .toc a.active { border-bottom-color: var(--accent); border-left: none; }
+    body { padding: 0 16px 60px; }
+  }
+
+  /* ============ HEADINGS ============ */
+  h1 {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, var(--accent), var(--lime));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    max-width: 560px;
+  }
+
+  .sec-head {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    margin: 40px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    scroll-margin-top: 80px;
+  }
+
+  /* ============ KPI ROW ============ */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 16px;
+    animation: fadeScale 0.35s ease-out both;
+    animation-delay: calc(var(--i, 0) * 0.06s);
+  }
+
+  .kpi-card__value {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+
+  .kpi-card__label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  /* ============ TYPE BREAKDOWN (mini bar chart) ============ */
+  .type-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .type-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 11px;
+    animation: fadeUp 0.3s ease-out both;
+    animation-delay: calc(var(--i, 0) * 0.04s);
+  }
+
+  .type-chip__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .type-chip__count {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .type-chip__name {
+    color: var(--text-dim);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ============ COVERAGE RING ============ */
+  .summary-hero {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .coverage-ring {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+  }
+
+  .coverage-ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .coverage-ring__bg {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 8;
+  }
+
+  .coverage-ring__fill {
+    fill: none;
+    stroke: var(--lime);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: var(--dash-filled) var(--dash-empty);
+    transition: stroke-dasharray 1s ease-out;
+  }
+
+  .coverage-ring__label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+  }
+
+  .coverage-ring__pct {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .coverage-ring__sub {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .status-bar {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .status-count {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .status-count__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .status-count__dot--pass { background: var(--pass); }
+  .status-count__dot--fail { background: var(--fail); }
+  .status-count__dot--skip { background: var(--skip); }
+  .status-count__dot--notrun { background: var(--text-dim); }
+
+  /* ============ COVERAGE HEATMAP ============ */
+  .heatmap {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .heatmap__cell {
+    padding: 10px 8px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    text-align: center;
+    border: 1px solid var(--border);
+    transition: transform 0.15s ease;
+    cursor: default;
+    animation: fadeUp 0.3s ease-out both;
+    animation-delay: calc(var(--i, 0) * 0.03s);
+  }
+
+  .heatmap__cell:hover { transform: scale(1.06); z-index: 2; }
+
+  .heatmap__cell .cell-name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+    font-size: 9px;
+    margin-bottom: 2px;
+  }
+
+  .heatmap__cell .cell-count {
+    font-weight: 700;
+    font-size: 18px;
+  }
+
+  /* Density tiers */
+  .heatmap__cell[data-density="0"] { background: var(--notrun-bg); color: var(--text-dim); }
+  .heatmap__cell[data-density="1"] { background: rgba(250, 204, 21, 0.12); color: #facc15; }
+  .heatmap__cell[data-density="2"] { background: rgba(234, 179, 8, 0.18); color: #eab308; }
+  .heatmap__cell[data-density="3"] { background: rgba(163, 230, 53, 0.18); color: #a3e635; }
+  .heatmap__cell[data-density="4"] { background: rgba(132, 204, 22, 0.22); color: #84cc16; }
+  .heatmap__cell[data-density="5"] { background: rgba(34, 197, 94, 0.22); color: #22c55e; }
+  .heatmap__cell[data-density="6"] { background: rgba(16, 185, 129, 0.28); color: #10b981; }
+
+  .heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+
+  .heatmap-legend__swatch {
+    width: 16px;
+    height: 12px;
+    border-radius: 2px;
+  }
+
+  /* ============ MERMAID (dependency graph) ============ */
+  .mermaid-wrap {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px 24px;
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    margin-bottom: 24px;
+  }
+  .mermaid-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
+  .mermaid-wrap::-webkit-scrollbar-track { background: transparent; }
+  .mermaid-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .mermaid-wrap .mermaid {
+    display: flex;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    transform-origin: top center;
+  }
+
+  .fullscreen-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .fullscreen-btn:hover { background: var(--border); color: var(--text); }
+
+  .mermaid-wrap.is-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    border-radius: 0;
+    border: none;
+    margin: 0;
+    padding: 40px;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+  }
+  .mermaid-wrap.is-fullscreen .fullscreen-btn {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 10001;
+  }
+  .mermaid-wrap.is-fullscreen .mermaid { transform-origin: center center; }
+  .mermaid-wrap.is-zoomed { cursor: grab; }
+  .mermaid-wrap.is-panning { cursor: grabbing; user-select: none; }
+
+  /* ============ DOMAIN SECTIONS (collapsible) ============ */
+  details.domain-section {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    animation: fadeUp 0.3s ease-out both;
+    animation-delay: calc(var(--i, 0) * 0.05s);
+  }
+
+  details.domain-section summary {
+    padding: 14px 20px;
+    background: var(--surface);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    transition: background 0.15s ease;
+  }
+  details.domain-section summary:hover { background: var(--surface2); }
+  details.domain-section summary::-webkit-details-marker { display: none; }
+
+  details.domain-section summary::before {
+    content: '\25B8';
+    font-size: 11px;
+    color: var(--text-dim);
+    transition: transform 0.15s ease;
+  }
+  details.domain-section[open] summary::before { transform: rotate(90deg); }
+
+  .domain-section__count {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--accent-dim);
+    color: var(--accent);
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-left: auto;
+  }
+
+  .domain-section__body {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    display: grid;
+    gap: 12px;
+  }
+
+  /* ============ TEST CARDS ============ */
+  .test-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--test-nav);
+    border-radius: 8px;
+    padding: 14px 18px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .test-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .test-card[data-type="NAV"]  { border-left-color: var(--test-nav); }
+  .test-card[data-type="AUTH"] { border-left-color: var(--test-auth); }
+  .test-card[data-type="CMP"]  { border-left-color: var(--test-cmp); }
+  .test-card[data-type="INT"]  { border-left-color: var(--test-int); }
+  .test-card[data-type="FRM"]  { border-left-color: var(--test-frm); }
+  .test-card[data-type="A11Y"] { border-left-color: var(--test-a11y); }
+  .test-card[data-type="VIS"]  { border-left-color: var(--test-vis); }
+  .test-card[data-type="E2E"]  { border-left-color: var(--test-e2e); }
+
+  .test-card__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+
+  .test-id {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--surface-elevated);
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .test-type-tag {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .test-type-tag[data-type="NAV"]  { background: var(--test-nav-dim);  color: var(--test-nav); }
+  .test-type-tag[data-type="AUTH"] { background: var(--test-auth-dim); color: var(--test-auth); }
+  .test-type-tag[data-type="CMP"]  { background: var(--test-cmp-dim);  color: var(--test-cmp); }
+  .test-type-tag[data-type="INT"]  { background: var(--test-int-dim);  color: var(--test-int); }
+  .test-type-tag[data-type="FRM"]  { background: var(--test-frm-dim);  color: var(--test-frm); }
+  .test-type-tag[data-type="A11Y"] { background: var(--test-a11y-dim); color: var(--test-a11y); }
+  .test-type-tag[data-type="VIS"]  { background: var(--test-vis-dim);  color: var(--test-vis); }
+  .test-type-tag[data-type="E2E"]  { background: var(--test-e2e-dim);  color: var(--test-e2e); }
+
+  .priority-tag {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .priority-tag--p0 { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+  .priority-tag--p1 { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+  .priority-tag--p2 { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
+  .priority-tag--p3 { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+
+  .test-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-left: auto;
+  }
+  .test-status--pass   { background: var(--pass-dim); color: var(--pass); }
+  .test-status--fail   { background: var(--fail-dim); color: var(--fail); }
+  .test-status--skip   { background: var(--skip-dim); color: var(--skip); }
+  .test-status--notrun { background: var(--notrun-bg); color: var(--text-dim); }
+
+  .test-card__desc {
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+
+  .test-card__steps {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .test-card__steps li {
+    padding-left: 20px;
+    position: relative;
+    color: var(--text-dim);
+  }
+  .test-card__steps li::before {
+    content: attr(data-step);
+    position: absolute;
+    left: 0;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .test-card__expected {
+    font-size: 12px;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+  .test-card__expected strong { color: var(--text); font-weight: 600; }
+
+  /* ============ PLAYWRIGHT FILE MAP TABLE ============ */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .table-scroll { overflow-x: auto; }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .data-table thead { position: sticky; top: 0; z-index: 2; }
+  .data-table th {
+    background: var(--surface-elevated);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--border-bright);
+    white-space: nowrap;
+  }
+
+  .data-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--text);
+  }
+  .data-table tbody tr:nth-child(even) { background: var(--accent-dim); }
+  .data-table tbody tr { transition: background 0.15s ease; }
+  .data-table tbody tr:hover { background: var(--border); }
+  .data-table tbody tr:last-child td { border-bottom: none; }
+
+  .data-table code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .data-table td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-family: var(--font-mono);
+  }
+
+  /* ============ CALLOUT ============ */
+  .callout {
+    background: color-mix(in srgb, var(--surface) 90%, var(--lime) 10%);
+    border: 1px solid color-mix(in srgb, var(--border) 60%, var(--lime) 40%);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+
+  .callout__title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--lime);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .callout__body {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .callout__body code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .callout__body pre {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-top: 10px;
+    overflow-x: auto;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  /* ============ ANIMATIONS ============ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeScale {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 768px) {
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .heatmap { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+    .summary-hero { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ===== TOC ===== -->
+  <nav class="toc" id="toc">
+    <div class="toc-title">Test Suite</div>
+    <a href="#s1">1. Summary</a>
+    <a href="#s2">2. Coverage Map</a>
+    <a href="#s3">3. Dependencies</a>
+    <a href="#s4">4. Auth Tests</a>
+    <a href="#s5">5. Navigation Tests</a>
+    <a href="#s6">6. Component Tests</a>
+    <a href="#s7">7. File Map</a>
+    <a href="#s8">8. Run Tests</a>
+  </nav>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main">
+    <h1>KEWK Fitness — Test Suite</h1>
+    <p class="subtitle">Derived from Stitch export analysis. 42 test cases across 8 categories covering 24 screens.</p>
+
+    <!-- ===== S1: TEST SUMMARY KPIs ===== -->
+    <div id="s1" class="sec-head">1 — Test Summary</div>
+
+    <div class="summary-hero">
+      <!-- Coverage ring: 75% = 212 of 283 circumference -->
+      <div class="coverage-ring" style="--dash-filled: 212; --dash-empty: 71;">
+        <svg viewBox="0 0 100 100">
+          <circle class="coverage-ring__bg" cx="50" cy="50" r="45"/>
+          <circle class="coverage-ring__fill" cx="50" cy="50" r="45"/>
+        </svg>
+        <div class="coverage-ring__label">
+          <span class="coverage-ring__pct">75%</span>
+          <span class="coverage-ring__sub">Coverage</span>
+        </div>
+      </div>
+      <div class="status-bar">
+        <div class="status-count"><div class="status-count__dot status-count__dot--pass"></div> 0 Pass</div>
+        <div class="status-count"><div class="status-count__dot status-count__dot--fail"></div> 0 Fail</div>
+        <div class="status-count"><div class="status-count__dot status-count__dot--skip"></div> 2 Skip</div>
+        <div class="status-count"><div class="status-count__dot status-count__dot--notrun"></div> 40 Not Run</div>
+      </div>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card" style="--i:0"><div class="kpi-card__value">42</div><div class="kpi-card__label">Total Tests</div></div>
+      <div class="kpi-card" style="--i:1"><div class="kpi-card__value">8</div><div class="kpi-card__label">Test Types</div></div>
+      <div class="kpi-card" style="--i:2"><div class="kpi-card__value">24</div><div class="kpi-card__label">Screens Covered</div></div>
+      <div class="kpi-card" style="--i:3"><div class="kpi-card__value">6</div><div class="kpi-card__label">Spec Files</div></div>
+    </div>
+
+    <div class="type-breakdown">
+      <div class="type-chip" style="--i:0"><div class="type-chip__dot" style="background:var(--test-nav)"></div><span class="type-chip__count">8</span><span class="type-chip__name">NAV</span></div>
+      <div class="type-chip" style="--i:1"><div class="type-chip__dot" style="background:var(--test-auth)"></div><span class="type-chip__count">5</span><span class="type-chip__name">AUTH</span></div>
+      <div class="type-chip" style="--i:2"><div class="type-chip__dot" style="background:var(--test-cmp)"></div><span class="type-chip__count">10</span><span class="type-chip__name">CMP</span></div>
+      <div class="type-chip" style="--i:3"><div class="type-chip__dot" style="background:var(--test-int)"></div><span class="type-chip__count">4</span><span class="type-chip__name">INT</span></div>
+      <div class="type-chip" style="--i:4"><div class="type-chip__dot" style="background:var(--test-frm)"></div><span class="type-chip__count">3</span><span class="type-chip__name">FRM</span></div>
+      <div class="type-chip" style="--i:5"><div class="type-chip__dot" style="background:var(--test-a11y)"></div><span class="type-chip__count">4</span><span class="type-chip__name">A11Y</span></div>
+      <div class="type-chip" style="--i:6"><div class="type-chip__dot" style="background:var(--test-vis)"></div><span class="type-chip__count">3</span><span class="type-chip__name">VIS</span></div>
+      <div class="type-chip" style="--i:7"><div class="type-chip__dot" style="background:var(--test-e2e)"></div><span class="type-chip__count">5</span><span class="type-chip__name">E2E</span></div>
+    </div>
+
+    <!-- ===== S2: COVERAGE HEATMAP ===== -->
+    <div id="s2" class="sec-head">2 — Coverage Heatmap</div>
+
+    <div class="heatmap-legend">
+      <span>Less</span>
+      <div class="heatmap-legend__swatch" style="background:var(--notrun-bg)"></div>
+      <div class="heatmap-legend__swatch" style="background:rgba(250,204,21,0.12)"></div>
+      <div class="heatmap-legend__swatch" style="background:rgba(234,179,8,0.18)"></div>
+      <div class="heatmap-legend__swatch" style="background:rgba(163,230,53,0.18)"></div>
+      <div class="heatmap-legend__swatch" style="background:rgba(132,204,22,0.22)"></div>
+      <div class="heatmap-legend__swatch" style="background:rgba(34,197,94,0.22)"></div>
+      <div class="heatmap-legend__swatch" style="background:rgba(16,185,129,0.28)"></div>
+      <span>More</span>
+    </div>
+
+    <div class="heatmap">
+      <div class="heatmap__cell" data-density="6" style="--i:0" title="Login — 6 tests"><span class="cell-name">Login</span><span class="cell-count">6</span></div>
+      <div class="heatmap__cell" data-density="4" style="--i:1" title="Signup — 4 tests"><span class="cell-name">Signup</span><span class="cell-count">4</span></div>
+      <div class="heatmap__cell" data-density="5" style="--i:2" title="Home — 5 tests"><span class="cell-name">Home</span><span class="cell-count">5</span></div>
+      <div class="heatmap__cell" data-density="3" style="--i:3" title="Workout Log — 3 tests"><span class="cell-name">Workout Log</span><span class="cell-count">3</span></div>
+      <div class="heatmap__cell" data-density="2" style="--i:4" title="Programs — 2 tests"><span class="cell-name">Programs</span><span class="cell-count">2</span></div>
+      <div class="heatmap__cell" data-density="2" style="--i:5" title="Program Detail — 2 tests"><span class="cell-name">Prog Detail</span><span class="cell-count">2</span></div>
+      <div class="heatmap__cell" data-density="3" style="--i:6" title="Nutrition — 3 tests"><span class="cell-name">Nutrition</span><span class="cell-count">3</span></div>
+      <div class="heatmap__cell" data-density="1" style="--i:7" title="Food Log — 1 test"><span class="cell-name">Food Log</span><span class="cell-count">1</span></div>
+      <div class="heatmap__cell" data-density="2" style="--i:8" title="Stats — 2 tests"><span class="cell-name">Stats</span><span class="cell-count">2</span></div>
+      <div class="heatmap__cell" data-density="1" style="--i:9" title="Settings — 1 test"><span class="cell-name">Settings</span><span class="cell-count">1</span></div>
+      <div class="heatmap__cell" data-density="1" style="--i:10" title="Profile — 1 test"><span class="cell-name">Profile</span><span class="cell-count">1</span></div>
+      <div class="heatmap__cell" data-density="0" style="--i:11" title="Coming Soon — 0 tests"><span class="cell-name">Coming Soon</span><span class="cell-count">0</span></div>
+    </div>
+
+    <!-- ===== S3: TEST DEPENDENCY GRAPH ===== -->
+    <div id="s3" class="sec-head">3 — Test Dependency Graph</div>
+
+    <div class="mermaid-wrap">
+      <button class="fullscreen-btn" onclick="toggleFullscreen(this)" title="Toggle fullscreen">&#x26F6;</button>
+      <pre class="mermaid">
+graph LR
+  AUTH["AUTH<br/>5 tests"] --> NAV["NAV<br/>8 tests"]
+  NAV --> CMP["CMP<br/>10 tests"]
+  CMP --> INT["INT<br/>4 tests"]
+  CMP --> FRM["FRM<br/>3 tests"]
+  INT --> E2E["E2E<br/>5 tests"]
+  FRM --> E2E
+  CMP --> A11Y["A11Y<br/>4 tests"]
+  CMP --> VIS["VIS<br/>3 tests"]
+
+  classDef auth fill:#f43f5e22,stroke:#f43f5e,color:#f43f5e
+  classDef nav fill:#06b6d422,stroke:#06b6d4,color:#06b6d4
+  classDef cmp fill:#8b5cf622,stroke:#8b5cf6,color:#8b5cf6
+  classDef int fill:#0ea5e922,stroke:#0ea5e9,color:#0ea5e9
+  classDef frm fill:#10b98122,stroke:#10b981,color:#10b981
+  classDef a11y fill:#d946ef22,stroke:#d946ef,color:#d946ef
+  classDef vis fill:#f9731622,stroke:#f97316,color:#f97316
+  classDef e2e fill:#6366f122,stroke:#6366f1,color:#6366f1
+
+  class AUTH auth
+  class NAV nav
+  class CMP cmp
+  class INT int
+  class FRM frm
+  class A11Y a11y
+  class VIS vis
+  class E2E e2e
+      </pre>
+    </div>
+
+    <!-- ===== S4: AUTH TESTS ===== -->
+    <div id="s4" class="sec-head">4 — Auth Tests</div>
+
+    <details class="domain-section" open style="--i:0">
+      <summary>
+        <span>Authentication</span>
+        <span class="domain-section__count">5 tests</span>
+      </summary>
+      <div class="domain-section__body">
+
+        <div class="test-card" data-type="AUTH">
+          <div class="test-card__header">
+            <span class="test-id">AUTH_001</span>
+            <span class="test-type-tag" data-type="AUTH">AUTH</span>
+            <span class="priority-tag priority-tag--p0">P0</span>
+            <span class="test-status test-status--notrun">Not Run</span>
+          </div>
+          <div class="test-card__desc">Login with valid email and password navigates to home screen</div>
+          <ol class="test-card__steps">
+            <li data-step="1.">Navigate to <code>/login</code></li>
+            <li data-step="2.">Enter valid email and password</li>
+            <li data-step="3.">Click Sign In button</li>
+          </ol>
+          <div class="test-card__expected"><strong>Expected:</strong> Redirects to home dashboard, user avatar visible in nav</div>
+        </div>
+
+        <div class="test-card" data-type="AUTH">
+          <div class="test-card__header">
+            <span class="test-id">AUTH_002</span>
+            <span class="test-type-tag" data-type="AUTH">AUTH</span>
+            <span class="priority-tag priority-tag--p0">P0</span>
+            <span class="test-status test-status--notrun">Not Run</span>
+          </div>
+          <div class="test-card__desc">Login with invalid credentials shows error message</div>
+          <ol class="test-card__steps">
+            <li data-step="1.">Navigate to <code>/login</code></li>
+            <li data-step="2.">Enter invalid credentials</li>
+            <li data-step="3.">Click Sign In button</li>
+          </ol>
+          <div class="test-card__expected"><strong>Expected:</strong> Error toast appears, remains on login page</div>
+        </div>
+
+        <div class="test-card" data-type="AUTH">
+          <div class="test-card__header">
+            <span class="test-id">AUTH_003</span>
+            <span class="test-type-tag" data-type="AUTH">AUTH</span>
+            <span class="priority-tag priority-tag--p0">P0</span>
+            <span class="test-status test-status--notrun">Not Run</span>
+          </div>
+          <div class="test-card__desc">Signup flow creates account and redirects to onboarding</div>
+          <ol class="test-card__steps">
+            <li data-step="1.">Navigate to <code>/signup</code></li>
+            <li data-step="2.">Fill name, email, password fields</li>
+            <li data-step="3.">Accept terms checkbox</li>
+            <li data-step="4.">Click Create Account</li>
+          </ol>
+          <div class="test-card__expected"><strong>Expected:</strong> Redirects to onboarding, welcome message visible</div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- ===== S5: NAVIGATION TESTS ===== -->
+    <div id="s5" class="sec-head">5 — Navigation Tests</div>
+
+    <details class="domain-section" open style="--i:1">
+      <summary>
+        <span>Navigation</span>
+        <span class="domain-section__count">8 tests</span>
+      </summary>
+      <div class="domain-section__body">
+
+        <div class="test-card" data-type="NAV">
+          <div class="test-card__header">
+            <span class="test-id">NAV_001</span>
+            <span class="test-type-tag" data-type="NAV">NAV</span>
+            <span class="priority-tag priority-tag--p0">P0</span>
+            <span class="test-status test-status--notrun">Not Run</span>
+          </div>
+          <div class="test-card__desc">Bottom nav Home tab navigates to home dashboard</div>
+          <ol class="test-card__steps">
+            <li data-step="1.">Click Home icon in bottom nav bar</li>
+          </ol>
+          <div class="test-card__expected"><strong>Expected:</strong> Home screen loads with KPI cards and quick-action buttons</div>
+        </div>
+
+        <div class="test-card" data-type="NAV">
+          <div class="test-card__header">
+            <span class="test-id">NAV_002</span>
+            <span class="test-type-tag" data-type="NAV">NAV</span>
+            <span class="priority-tag priority-tag--p0">P0</span>
+            <span class="test-status test-status--notrun">Not Run</span>
+          </div>
+          <div class="test-card__desc">Bottom nav Workout tab navigates to workout log</div>
+          <ol class="test-card__steps">
+            <li data-step="1.">Click Workout icon in bottom nav bar</li>
+          </ol>
+          <div class="test-card__expected"><strong>Expected:</strong> Workout log screen loads with recent workouts list</div>
+        </div>
+
+        <div class="test-card" data-type="NAV">
+          <div class="test-card__header">
+            <span class="test-id">NAV_003</span>
+            <span class="test-type-tag" data-type="NAV">NAV</span>
+            <span class="priority-tag priority-tag--p1">P1</span>
+            <span class="test-status test-status--notrun">Not Run</span>
+          </div>
+          <div class="test-card__desc">Programs card on home navigates to programs library</div>
+          <ol class="test-card__steps">
+            <li data-step="1.">From home, click Programs card</li>
+          </ol>
+          <div class="test-card__expected"><strong>Expected:</strong> Programs library loads with program cards grid</div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- ===== S6: COMPONENT TESTS ===== -->
+    <div id="s6" class="sec-head">6 — Component Tests</div>
+
+    <details class="domain-section" style="--i:2">
+      <summary>
+        <span>Component Verification</span>
+        <span class="domain-section__count">10 tests</span>
+      </summary>
+      <div class="domain-section__body">
+
+        <div class="test-card" data-type="CMP">
+          <div class="test-card__header">
+            <span class="test-id">CMP_001</span>
+            <span class="test-type-tag" data-type="CMP">CMP</span>
+            <span class="priority-tag priority-tag--p1">P1</span>
+            <span class="test-status test-status--notrun">Not Run</span>
+          </div>
+          <div class="test-card__desc">Home screen renders KPI cards (workouts this week, streak, body weight)</div>
+          <ol class="test-card__steps">
+            <li data-step="1.">Navigate to home screen</li>
+            <li data-step="2.">Check for KPI card elements</li>
+          </ol>
+          <div class="test-card__expected"><strong>Expected:</strong> Three KPI cards visible with numeric values and labels</div>
+        </div>
+
+        <div class="test-card" data-type="CMP">
+          <div class="test-card__header">
+            <span class="test-id">CMP_002</span>
+            <span class="test-type-tag" data-type="CMP">CMP</span>
+            <span class="priority-tag priority-tag--p1">P1</span>
+            <span class="test-status test-status--notrun">Not Run</span>
+          </div>
+          <div class="test-card__desc">Workout log screen shows exercise list with set/rep/weight columns</div>
+          <ol class="test-card__steps">
+            <li data-step="1.">Navigate to active workout</li>
+            <li data-step="2.">Verify exercise rows with set data</li>
+          </ol>
+          <div class="test-card__expected"><strong>Expected:</strong> Each exercise has header and editable set rows</div>
+        </div>
+
+        <div class="test-card" data-type="FRM">
+          <div class="test-card__header">
+            <span class="test-id">FRM_001</span>
+            <span class="test-type-tag" data-type="FRM">FRM</span>
+            <span class="priority-tag priority-tag--p1">P1</span>
+            <span class="test-status test-status--notrun">Not Run</span>
+          </div>
+          <div class="test-card__desc">Workout set form validates weight and reps inputs</div>
+          <ol class="test-card__steps">
+            <li data-step="1.">Navigate to active workout</li>
+            <li data-step="2.">Submit set with empty weight field</li>
+            <li data-step="3.">Submit set with negative reps</li>
+          </ol>
+          <div class="test-card__expected"><strong>Expected:</strong> Validation error shown, set not saved</div>
+        </div>
+
+      </div>
+    </details>
+
+    <details class="domain-section" style="--i:3">
+      <summary>
+        <span>E2E User Journeys</span>
+        <span class="domain-section__count">5 tests</span>
+      </summary>
+      <div class="domain-section__body">
+
+        <div class="test-card" data-type="E2E">
+          <div class="test-card__header">
+            <span class="test-id">E2E_001</span>
+            <span class="test-type-tag" data-type="E2E">E2E</span>
+            <span class="priority-tag priority-tag--p0">P0</span>
+            <span class="test-status test-status--notrun">Not Run</span>
+          </div>
+          <div class="test-card__desc">Full workout logging flow: login, start workout, log 3 exercises, complete</div>
+          <ol class="test-card__steps">
+            <li data-step="1.">Login with test credentials</li>
+            <li data-step="2.">Navigate to Workout tab</li>
+            <li data-step="3.">Tap Start Workout</li>
+            <li data-step="4.">Add 3 exercises with sets</li>
+            <li data-step="5.">Tap Complete Workout</li>
+          </ol>
+          <div class="test-card__expected"><strong>Expected:</strong> Workout saved, summary shown, streak counter incremented</div>
+        </div>
+
+        <div class="test-card" data-type="E2E">
+          <div class="test-card__header">
+            <span class="test-id">E2E_002</span>
+            <span class="test-type-tag" data-type="E2E">E2E</span>
+            <span class="priority-tag priority-tag--p1">P1</span>
+            <span class="test-status test-status--notrun">Not Run</span>
+          </div>
+          <div class="test-card__desc">Program enrollment: browse programs, select, enroll, see first workout day</div>
+          <ol class="test-card__steps">
+            <li data-step="1.">Navigate to Programs library</li>
+            <li data-step="2.">Tap a program card</li>
+            <li data-step="3.">Tap Start Program</li>
+            <li data-step="4.">Verify enrolled state</li>
+          </ol>
+          <div class="test-card__expected"><strong>Expected:</strong> Program active, Day 1 exercises shown, progress tracker visible</div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- ===== S7: PLAYWRIGHT FILE MAP ===== -->
+    <div id="s7" class="sec-head">7 — Playwright File Map</div>
+
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Domain</th>
+              <th class="num">Tests</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>tests/auth.spec.ts</code></td>
+              <td><span class="test-type-tag" data-type="AUTH">AUTH</span></td>
+              <td class="num">5</td>
+              <td>Login, signup, password reset, session persistence</td>
+            </tr>
+            <tr>
+              <td><code>tests/navigation.spec.ts</code></td>
+              <td><span class="test-type-tag" data-type="NAV">NAV</span></td>
+              <td class="num">8</td>
+              <td>Bottom nav tabs, screen-to-screen links, back navigation</td>
+            </tr>
+            <tr>
+              <td><code>tests/workout.spec.ts</code></td>
+              <td><span class="test-type-tag" data-type="CMP">CMP</span> <span class="test-type-tag" data-type="FRM">FRM</span></td>
+              <td class="num">10</td>
+              <td>Workout components, set logging forms, validation</td>
+            </tr>
+            <tr>
+              <td><code>tests/accessibility.spec.ts</code></td>
+              <td><span class="test-type-tag" data-type="A11Y">A11Y</span></td>
+              <td class="num">4</td>
+              <td>Heading hierarchy, ARIA labels, tab order, color contrast</td>
+            </tr>
+            <tr>
+              <td><code>tests/visual.spec.ts</code></td>
+              <td><span class="test-type-tag" data-type="VIS">VIS</span></td>
+              <td class="num">3</td>
+              <td>Screenshot comparison against Stitch baselines</td>
+            </tr>
+            <tr>
+              <td><code>tests/e2e.spec.ts</code></td>
+              <td><span class="test-type-tag" data-type="E2E">E2E</span></td>
+              <td class="num">5</td>
+              <td>Full user journeys: workout flow, program enrollment, onboarding</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Support File</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>tests/fixtures.ts</code></td>
+              <td>Shared test fixtures: authenticated page, test user, seed data</td>
+            </tr>
+            <tr>
+              <td><code>tests/pages/HomePage.ts</code></td>
+              <td>Page Object Model for home dashboard</td>
+            </tr>
+            <tr>
+              <td><code>tests/pages/WorkoutPage.ts</code></td>
+              <td>Page Object Model for workout logging</td>
+            </tr>
+            <tr>
+              <td><code>playwright.config.ts</code></td>
+              <td>Base URL, viewport, screenshot on failure, retries</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== S8: RUN TESTS CALLOUT ===== -->
+    <div id="s8" class="sec-head">8 — Running Tests</div>
+
+    <div class="callout">
+      <div class="callout__title">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l6 5-6 5V3z" fill="currentColor"/></svg>
+        How to Run
+      </div>
+      <div class="callout__body">
+        <p>Install dependencies and run the generated Playwright tests:</p>
+        <pre>cd ~/.agent/tests/kewk-fitness
+npm install
+npx playwright install
+npx playwright test
+npx playwright test --ui  # interactive mode</pre>
+        <p style="margin-top:12px">Visual regression baselines are generated from Stitch <code>screen.png</code> files, stored in <code>tests/baselines/</code>. Update baselines after intentional UI changes with <code>npx playwright test --update-snapshots</code>.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout__title">Configuration Notes</div>
+      <div class="callout__body">
+        <p>Set <code>BASE_URL</code> in <code>playwright.config.ts</code> to your dev server address. Default: <code>http://localhost:3000</code>. Auth tests use <code>TEST_USER_EMAIL</code> and <code>TEST_USER_PASSWORD</code> environment variables.</p>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /wrap -->
+
+<!-- ===== SCRIPTS ===== -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    look: 'classic',
+    themeVariables: {
+      primaryColor: isDark ? '#1c1836' : '#ede9fe',
+      primaryBorderColor: isDark ? '#818cf8' : '#6366f1',
+      primaryTextColor: isDark ? '#e8e6f0' : '#1e1b4b',
+      secondaryColor: isDark ? '#14112a' : '#f5f3ff',
+      secondaryBorderColor: isDark ? '#6366f1' : '#818cf8',
+      lineColor: isDark ? '#4b5563' : '#9ca3af',
+      fontSize: '14px',
+      fontFamily: 'Sora, system-ui, sans-serif',
+    },
+  });
+</script>
+<script>
+  // ===== Fullscreen toggle + zoom + pan =====
+  function toggleFullscreen(btn) {
+    var wrap = btn.closest('.mermaid-wrap');
+    var target = wrap.querySelector('.mermaid');
+    var isFS = wrap.classList.toggle('is-fullscreen');
+    btn.innerHTML = isFS ? '&#x2715;' : '&#x26F6;';
+    btn.title = isFS ? 'Exit fullscreen' : 'Toggle fullscreen';
+    if (!isFS) {
+      target.dataset.zoom = '1';
+      target.style.transform = 'scale(1)';
+      wrap.classList.remove('is-zoomed');
+    }
+    document.body.style.overflow = isFS ? 'hidden' : '';
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var fs = document.querySelector('.mermaid-wrap.is-fullscreen');
+      if (fs) toggleFullscreen(fs.querySelector('.fullscreen-btn'));
+    }
+  });
+
+  document.querySelectorAll('.mermaid-wrap').forEach(function(wrap) {
+    wrap.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      var target = wrap.querySelector('.mermaid');
+      var current = parseFloat(target.dataset.zoom || '1');
+      var factor = e.deltaY < 0 ? 1.15 : 0.87;
+      var maxZoom = wrap.classList.contains('is-fullscreen') ? 20 : 8;
+      var next = Math.min(Math.max(current * factor, 0.2), maxZoom);
+      target.dataset.zoom = next;
+      target.style.transform = 'scale(' + next + ')';
+      wrap.classList.toggle('is-zoomed', next > 1);
+    }, { passive: false });
+
+    var startX, startY, scrollL, scrollT;
+    wrap.addEventListener('mousedown', function(e) {
+      if (e.target.closest('.fullscreen-btn')) return;
+      var target = wrap.querySelector('.mermaid');
+      if (parseFloat(target.dataset.zoom || '1') <= 1) return;
+      wrap.classList.add('is-panning');
+      startX = e.clientX; startY = e.clientY;
+      scrollL = wrap.scrollLeft; scrollT = wrap.scrollTop;
+    });
+    window.addEventListener('mousemove', function(e) {
+      if (!wrap.classList.contains('is-panning')) return;
+      wrap.scrollLeft = scrollL - (e.clientX - startX);
+      wrap.scrollTop = scrollT - (e.clientY - startY);
+    });
+    window.addEventListener('mouseup', function() { wrap.classList.remove('is-panning'); });
+  });
+
+  // ===== Scroll spy for TOC =====
+  (function() {
+    var links = document.querySelectorAll('.toc a');
+    var sections = [];
+    links.forEach(function(a) {
+      var id = a.getAttribute('href').replace('#', '');
+      var el = document.getElementById(id);
+      if (el) sections.push({ id: id, el: el, link: a });
+    });
+
+    function update() {
+      var scrollY = window.scrollY + 120;
+      var active = sections[0];
+      for (var i = 0; i < sections.length; i++) {
+        if (sections[i].el.offsetTop <= scrollY) active = sections[i];
+      }
+      links.forEach(function(a) { a.classList.remove('active'); });
+      if (active) active.link.classList.add('active');
+    }
+
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  })();
+</script>
+
+</body>
+</html>

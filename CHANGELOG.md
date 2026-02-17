@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0] - 2026-02-16
+
+### Added
+- **Test suite generation** from Stitch exports — visual HTML test matrix + runnable Playwright test files
+- Test derivation algorithm: 8 test types (NAV, AUTH, CMP, INT, FRM, A11Y, VIS, E2E) derived from flow edges, screens, and agent tasks
+- `templates/test-suite.html` — Electric indigo/lime "test lab" reference template with coverage heatmap, dependency graph, test cards, and file map
+- `prompts/stitch-generate-tests.md` — Prompt template for `/stitch-generate-tests` command
+- Test suite CSS patterns in `references/css-patterns.md`: test cards, status indicators, type tags, coverage ring, heatmap
+- Playwright output structure with Page Object Model, fixtures, and visual baselines from Stitch `screen.png` files
+- Quality check: screen coverage, flow coverage, task coverage, no orphan tests
+- Test suite completeness criteria added to SKILL.md quality checks
+
 ## [0.1.0] - 2026-02-16
 
 Initial release.

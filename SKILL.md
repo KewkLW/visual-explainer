@@ -6,7 +6,7 @@ compatibility: Requires a browser to view generated HTML files. Optional surf-cl
 metadata:
   author: KewkLW
   upstream: nicobailon/visual-explainer
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
 # Stitch Visual Explainer
@@ -90,6 +90,75 @@ When generating flow diagrams for apps or multi-screen systems, **always include
 2. A **KPI card row** summarizing each tier (task count + screen count)
 
 **The task descriptions must be specific enough that an AI agent can start implementing from the task alone**, referencing the screen folder names and key UI elements found during analysis.
+
+## Test Generation
+
+When generating tests from a Stitch export analysis, derive test cases systematically from the same data used for flow diagrams and task lists. Every screen, flow edge, and P0–P1 task should map to at least one test.
+
+### Test Derivation Algorithm
+
+| Source Data | Test Prefix | What's Derived |
+|-------------|-------------|----------------|
+| Navigation flow edges | `NAV_xxx` | Click trigger element → verify destination screen loads (check heading, key element) |
+| Auth flow paths | `AUTH_xxx` | Login/signup/magic-link → verify auth state change (redirect, session, user element) |
+| Domain screens | `CMP_xxx` | Navigate to screen → verify key headings, buttons, inputs exist on the page |
+| Interactive elements | `INT_xxx` | Toggle/click/select element → verify state change (class toggle, value update, visibility) |
+| Forms | `FRM_xxx` | Empty/valid/invalid submit → verify validation messages and success states |
+| `screen.png` files | `VIS_xxx` | Full-page screenshot comparison against Stitch baseline image |
+| Screen structure | `A11Y_xxx` | Heading hierarchy (h1→h2→h3), label associations, ARIA roles, tab order |
+| P0–P1 agent tasks | `E2E_xxx` | Full user journey from task acceptance criteria (multi-step, cross-screen) |
+
+**Numbering:** Within each prefix, number sequentially starting at 001 (`NAV_001`, `NAV_002`, …).
+
+**Priority mapping:** Tests inherit priority from their source — auth/nav foundation tests are P0, core feature tests are P1, deeper features P2–P3.
+
+### Test Output Structure
+
+Generate two outputs:
+
+**1. Visual test suite** — An HTML page using the `test-suite.html` template aesthetic (electric indigo/lime "test lab" palette):
+- Test summary KPIs with SVG coverage ring
+- Coverage heatmap (screens × test density)
+- Test dependency graph (Mermaid: AUTH→NAV→CMP→INT/FRM→E2E)
+- Domain test sections (collapsible) with test case cards
+- Playwright file map table
+- Run instructions callout
+
+Write to `~/.agent/diagrams/<app-name>-tests.html` and open in browser.
+
+**2. Playwright test files** — Runnable `.spec.ts` files using Page Object Model:
+
+```
+~/.agent/tests/<app-name>/
+├── playwright.config.ts          # baseURL, viewport, retries, screenshot on failure
+├── tests/
+│   ├── fixtures.ts               # authenticated page, test user, seed data helpers
+│   ├── auth.spec.ts              # AUTH_xxx tests
+│   ├── navigation.spec.ts        # NAV_xxx tests
+│   ├── <domain>.spec.ts          # CMP_xxx, INT_xxx, FRM_xxx for each domain
+│   ├── accessibility.spec.ts     # A11Y_xxx tests
+│   ├── visual.spec.ts            # VIS_xxx screenshot comparisons
+│   ├── e2e.spec.ts               # E2E_xxx full journey tests
+│   └── pages/
+│       └── <ScreenName>Page.ts   # Page Object per major screen
+└── baselines/
+    └── <screen>.png              # Copied from Stitch export screen.png files
+```
+
+**Page Object Model:** Each major screen gets a `Page.ts` class with:
+- Locators for key elements (heading, buttons, inputs, nav items)
+- Action methods (`login(email, password)`, `startWorkout()`, `addSet(weight, reps)`)
+- Assertion helpers (`expectLoaded()`, `expectError(message)`)
+
+**Visual baselines:** Copy `screen.png` files from the Stitch export into `baselines/` for `VIS_xxx` screenshot comparison tests.
+
+### Test Suite Quality Check
+
+Add to the quality check pass:
+- **Screen coverage:** Every screen from the Stitch export has at least one `CMP_xxx` test
+- **Flow coverage:** Every navigation edge in the flow diagram has a corresponding `NAV_xxx` test
+- **Task coverage:** Every P0–P1 agent task has at least one `E2E_xxx` test
+- **No orphans:** Every test references a real screen folder name from the export
 
 ## General Workflow
 

@@ -16,6 +16,7 @@ You export screens from Stitch. Each screen becomes a folder with `code.html` (T
 3. **Prioritized agent task list** — A P0–P6 build roadmap with dependencies, so AI agents know exactly what to build and in what order
 4. **Tech stack analysis** — Extracts fonts, colors, frameworks, and design patterns from the HTML
 5. **User journey maps** — Core interaction loops visualized as flowcharts
+6. **Test suite generation** — A visual HTML test matrix + runnable Playwright test files, derived from navigation flows, domain screens, and agent task acceptance criteria
 
 The output is a single self-contained HTML file with interactive diagrams (fullscreen toggle, scroll-to-zoom, drag-to-pan), responsive sidebar TOC, and both light/dark theme support.
 
@@ -80,6 +81,7 @@ The agent will:
 | `/plan-review` | Compare a plan against the codebase |
 | `/project-recap` | Architecture snapshot for context-switching |
 | `/fact-check` | Verify claims in documents against code |
+| `/stitch-generate-tests` | Generate test suite (visual HTML + Playwright files) from a Stitch export |
 
 ## How It Works
 
@@ -96,9 +98,11 @@ references/           ← agent reads before each generation
 templates/            ← agent reads the matching reference template
 ├── architecture.html (CSS Grid cards)
 ├── mermaid-flowchart.html (Mermaid + ELK)
-└── data-table.html   (tables with KPIs)
+├── data-table.html   (tables with KPIs)
+└── test-suite.html   (test matrix + coverage heatmap)
     ↓
-~/.agent/diagrams/app-name-flow.html → opens in browser
+~/.agent/diagrams/app-name-flow.html  → opens in browser
+~/.agent/tests/app-name/              → Playwright test files
 ```
 
 ## Upstream
@@ -114,7 +118,7 @@ Everything. All original features work exactly as before:
 - Proactive table rendering (4+ rows → HTML instead of ASCII)
 - Reference templates with distinct palettes for variety
 - AI-generated illustrations via surf-cli (optional)
-- Five prompt templates (generate, diff-review, plan-review, project-recap, fact-check)
+- Six prompt templates (generate, diff-review, plan-review, project-recap, fact-check, stitch-analyze)
 
 ## Limitations
 

@@ -1184,3 +1184,319 @@ Small image floated beside a section. Use when the illustration supports but doe
 ```html
 <img class="accent-img" src="data:image/png;base64,..." alt="Descriptive alt text">
 ```
+
+## Test Suite Visualization
+
+Patterns for test case cards, status indicators, coverage heatmaps, and coverage rings. Used by the test-suite template.
+
+### Test Case Cards
+
+Cards with type-colored left borders. Each test type gets a distinct accent.
+
+```css
+/* Test type colors */
+:root {
+  --test-nav: #06b6d4;     --test-nav-dim: rgba(6, 182, 212, 0.10);
+  --test-auth: #f43f5e;    --test-auth-dim: rgba(244, 63, 94, 0.10);
+  --test-cmp: #8b5cf6;     --test-cmp-dim: rgba(139, 92, 246, 0.10);
+  --test-int: #0ea5e9;     --test-int-dim: rgba(14, 165, 233, 0.10);
+  --test-frm: #10b981;     --test-frm-dim: rgba(16, 185, 129, 0.10);
+  --test-a11y: #d946ef;    --test-a11y-dim: rgba(217, 70, 239, 0.10);
+  --test-vis: #f97316;     --test-vis-dim: rgba(249, 115, 22, 0.10);
+  --test-e2e: #6366f1;     --test-e2e-dim: rgba(99, 102, 241, 0.10);
+}
+
+.test-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--test-nav);
+  border-radius: 8px;
+  padding: 16px 20px;
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.test-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Type variants — set on each card */
+.test-card[data-type="NAV"]  { border-left-color: var(--test-nav); }
+.test-card[data-type="AUTH"] { border-left-color: var(--test-auth); }
+.test-card[data-type="CMP"]  { border-left-color: var(--test-cmp); }
+.test-card[data-type="INT"]  { border-left-color: var(--test-int); }
+.test-card[data-type="FRM"]  { border-left-color: var(--test-frm); }
+.test-card[data-type="A11Y"] { border-left-color: var(--test-a11y); }
+.test-card[data-type="VIS"]  { border-left-color: var(--test-vis); }
+.test-card[data-type="E2E"]  { border-left-color: var(--test-e2e); }
+
+.test-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.test-card__steps {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.test-card__steps li {
+  padding-left: 20px;
+  position: relative;
+  color: var(--text-dim);
+}
+
+.test-card__steps li::before {
+  content: attr(data-step);
+  position: absolute;
+  left: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.test-card__expected {
+  font-size: 12px;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  margin-top: 8px;
+}
+
+.test-card__expected strong {
+  color: var(--text);
+  font-weight: 600;
+}
+```
+
+### Test ID Badge
+
+Monospace badge identifying each test case.
+
+```css
+.test-id {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--surface-elevated, var(--surface2));
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+```
+
+### Test Status Indicators
+
+Pass/fail/skip/not-run states for test results.
+
+```css
+.test-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.test-status--pass {
+  background: rgba(132, 204, 22, 0.12);
+  color: #84cc16;
+}
+
+.test-status--fail {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.test-status--skip {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+}
+
+.test-status--notrun {
+  background: var(--border);
+  color: var(--text-dim);
+}
+```
+
+### Test Type Tags
+
+Small colored badges indicating the test category.
+
+```css
+.test-type-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.test-type-tag[data-type="NAV"]  { background: var(--test-nav-dim);  color: var(--test-nav); }
+.test-type-tag[data-type="AUTH"] { background: var(--test-auth-dim); color: var(--test-auth); }
+.test-type-tag[data-type="CMP"]  { background: var(--test-cmp-dim);  color: var(--test-cmp); }
+.test-type-tag[data-type="INT"]  { background: var(--test-int-dim);  color: var(--test-int); }
+.test-type-tag[data-type="FRM"]  { background: var(--test-frm-dim);  color: var(--test-frm); }
+.test-type-tag[data-type="A11Y"] { background: var(--test-a11y-dim); color: var(--test-a11y); }
+.test-type-tag[data-type="VIS"]  { background: var(--test-vis-dim);  color: var(--test-vis); }
+.test-type-tag[data-type="E2E"]  { background: var(--test-e2e-dim);  color: var(--test-e2e); }
+```
+
+### Coverage Heatmap
+
+CSS Grid of screen cells, colored by test density. Higher density = warmer color.
+
+```css
+.heatmap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 6px;
+}
+
+.heatmap__cell {
+  padding: 10px 8px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-align: center;
+  border: 1px solid var(--border);
+  transition: transform 0.15s ease;
+  cursor: default;
+  position: relative;
+}
+
+.heatmap__cell:hover { transform: scale(1.05); }
+
+.heatmap__cell .cell-name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+  font-size: 10px;
+  margin-bottom: 2px;
+}
+
+.heatmap__cell .cell-count {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* Density tiers (0 tests → 6+ tests) */
+.heatmap__cell[data-density="0"] { background: var(--border); color: var(--text-dim); }
+.heatmap__cell[data-density="1"] { background: rgba(250, 204, 21, 0.15); color: #facc15; }
+.heatmap__cell[data-density="2"] { background: rgba(234, 179, 8, 0.20); color: #eab308; }
+.heatmap__cell[data-density="3"] { background: rgba(163, 230, 53, 0.20); color: #a3e635; }
+.heatmap__cell[data-density="4"] { background: rgba(132, 204, 22, 0.25); color: #84cc16; }
+.heatmap__cell[data-density="5"] { background: rgba(34, 197, 94, 0.25); color: #22c55e; }
+.heatmap__cell[data-density="6"] { background: rgba(16, 185, 129, 0.30); color: #10b981; }
+```
+
+### Coverage Ring
+
+SVG circular progress indicator for overall test coverage.
+
+```css
+.coverage-ring {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.coverage-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.coverage-ring__bg {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 8;
+}
+
+.coverage-ring__fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: var(--dash-filled) var(--dash-empty);
+  transition: stroke-dasharray 1s ease-out;
+}
+
+.coverage-ring__label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+}
+
+.coverage-ring__pct {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.coverage-ring__sub {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+```
+
+Usage (set `--dash-filled` and `--dash-empty` based on percentage — circumference of r=45 is ~283):
+```html
+<div class="coverage-ring" style="--dash-filled: 212; --dash-empty: 71;">
+  <svg viewBox="0 0 100 100">
+    <circle class="coverage-ring__bg" cx="50" cy="50" r="45"/>
+    <circle class="coverage-ring__fill" cx="50" cy="50" r="45"/>
+  </svg>
+  <div class="coverage-ring__label">
+    <span class="coverage-ring__pct">75%</span>
+    <span class="coverage-ring__sub">Coverage</span>
+  </div>
+</div>
+```
+
+### Priority Tags (for test cards)
+
+Small priority badges matching the existing P0–P6 tier system.
+
+```css
+.priority-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.priority-tag--p0 { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+.priority-tag--p1 { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+.priority-tag--p2 { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
+.priority-tag--p3 { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+```
