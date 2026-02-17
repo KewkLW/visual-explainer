@@ -59,9 +59,9 @@ git clone https://github.com/KewkLW/visual-explainer.git ~/.claude/skills/visual
 Export your screens from Stitch, then point the agent at the folder:
 
 ```
-> use visual-explainer to explain the flow of C:\path\to\stitch_export
-> /generate-web-diagram for the app at ~/Downloads/my_stitch_project
-> /stitch-analyze ~/exports/fitness_app
+> /stitch-analyze ~/path/to/stitch_export
+> /stitch-generate-tests ~/path/to/stitch_export
+> /generate-web-diagram for the app at ~/path/to/stitch_export
 ```
 
 The agent will:

@@ -860,8 +860,8 @@
 
   <!-- ===== MAIN ===== -->
   <div class="main">
-    <h1>KEWK Fitness — Test Suite</h1>
-    <p class="subtitle">Derived from Stitch export analysis. 42 test cases across 8 categories covering 24 screens.</p>
+    <h1>App Name — Test Suite</h1>
+    <p class="subtitle">Derived from Stitch export analysis. N test cases across 8 categories covering M screens.</p>
 
     <!-- ===== S1: TEST SUMMARY KPIs ===== -->
     <div id="s1" class="sec-head">1 — Test Summary</div>
@@ -920,18 +920,18 @@
     </div>
 
     <div class="heatmap">
-      <div class="heatmap__cell" data-density="6" style="--i:0" title="Login — 6 tests"><span class="cell-name">Login</span><span class="cell-count">6</span></div>
-      <div class="heatmap__cell" data-density="4" style="--i:1" title="Signup — 4 tests"><span class="cell-name">Signup</span><span class="cell-count">4</span></div>
-      <div class="heatmap__cell" data-density="5" style="--i:2" title="Home — 5 tests"><span class="cell-name">Home</span><span class="cell-count">5</span></div>
-      <div class="heatmap__cell" data-density="3" style="--i:3" title="Workout Log — 3 tests"><span class="cell-name">Workout Log</span><span class="cell-count">3</span></div>
-      <div class="heatmap__cell" data-density="2" style="--i:4" title="Programs — 2 tests"><span class="cell-name">Programs</span><span class="cell-count">2</span></div>
-      <div class="heatmap__cell" data-density="2" style="--i:5" title="Program Detail — 2 tests"><span class="cell-name">Prog Detail</span><span class="cell-count">2</span></div>
-      <div class="heatmap__cell" data-density="3" style="--i:6" title="Nutrition — 3 tests"><span class="cell-name">Nutrition</span><span class="cell-count">3</span></div>
-      <div class="heatmap__cell" data-density="1" style="--i:7" title="Food Log — 1 test"><span class="cell-name">Food Log</span><span class="cell-count">1</span></div>
-      <div class="heatmap__cell" data-density="2" style="--i:8" title="Stats — 2 tests"><span class="cell-name">Stats</span><span class="cell-count">2</span></div>
-      <div class="heatmap__cell" data-density="1" style="--i:9" title="Settings — 1 test"><span class="cell-name">Settings</span><span class="cell-count">1</span></div>
-      <div class="heatmap__cell" data-density="1" style="--i:10" title="Profile — 1 test"><span class="cell-name">Profile</span><span class="cell-count">1</span></div>
-      <div class="heatmap__cell" data-density="0" style="--i:11" title="Coming Soon — 0 tests"><span class="cell-name">Coming Soon</span><span class="cell-count">0</span></div>
+      <div class="heatmap__cell" data-density="6" style="--i:0" title="Screen A — 6 tests"><span class="cell-name">Screen A</span><span class="cell-count">6</span></div>
+      <div class="heatmap__cell" data-density="4" style="--i:1" title="Screen B — 4 tests"><span class="cell-name">Screen B</span><span class="cell-count">4</span></div>
+      <div class="heatmap__cell" data-density="5" style="--i:2" title="Screen C — 5 tests"><span class="cell-name">Screen C</span><span class="cell-count">5</span></div>
+      <div class="heatmap__cell" data-density="3" style="--i:3" title="Screen D — 3 tests"><span class="cell-name">Screen D</span><span class="cell-count">3</span></div>
+      <div class="heatmap__cell" data-density="2" style="--i:4" title="Screen E — 2 tests"><span class="cell-name">Screen E</span><span class="cell-count">2</span></div>
+      <div class="heatmap__cell" data-density="2" style="--i:5" title="Screen F — 2 tests"><span class="cell-name">Screen F</span><span class="cell-count">2</span></div>
+      <div class="heatmap__cell" data-density="3" style="--i:6" title="Screen G — 3 tests"><span class="cell-name">Screen G</span><span class="cell-count">3</span></div>
+      <div class="heatmap__cell" data-density="1" style="--i:7" title="Screen H — 1 test"><span class="cell-name">Screen H</span><span class="cell-count">1</span></div>
+      <div class="heatmap__cell" data-density="2" style="--i:8" title="Screen I — 2 tests"><span class="cell-name">Screen I</span><span class="cell-count">2</span></div>
+      <div class="heatmap__cell" data-density="1" style="--i:9" title="Screen J — 1 test"><span class="cell-name">Screen J</span><span class="cell-count">1</span></div>
+      <div class="heatmap__cell" data-density="1" style="--i:10" title="Screen K — 1 test"><span class="cell-name">Screen K</span><span class="cell-count">1</span></div>
+      <div class="heatmap__cell" data-density="0" style="--i:11" title="Screen L — 0 tests"><span class="cell-name">Screen L</span><span class="cell-count">0</span></div>
     </div>
 
     <!-- ===== S3: TEST DEPENDENCY GRAPH ===== -->
@@ -987,13 +987,13 @@ graph LR
             <span class="priority-tag priority-tag--p0">P0</span>
             <span class="test-status test-status--notrun">Not Run</span>
           </div>
-          <div class="test-card__desc">Login with valid email and password navigates to home screen</div>
+          <div class="test-card__desc">Valid credentials redirect to authenticated landing page</div>
           <ol class="test-card__steps">
-            <li data-step="1.">Navigate to <code>/login</code></li>
-            <li data-step="2.">Enter valid email and password</li>
-            <li data-step="3.">Click Sign In button</li>
+            <li data-step="1.">Navigate to login screen</li>
+            <li data-step="2.">Enter valid credentials</li>
+            <li data-step="3.">Submit form</li>
           </ol>
-          <div class="test-card__expected"><strong>Expected:</strong> Redirects to home dashboard, user avatar visible in nav</div>
+          <div class="test-card__expected"><strong>Expected:</strong> Redirects to main screen, user element visible</div>
         </div>
 
         <div class="test-card" data-type="AUTH">
@@ -1003,13 +1003,13 @@ graph LR
             <span class="priority-tag priority-tag--p0">P0</span>
             <span class="test-status test-status--notrun">Not Run</span>
           </div>
-          <div class="test-card__desc">Login with invalid credentials shows error message</div>
+          <div class="test-card__desc">Invalid credentials show error, remain on login</div>
           <ol class="test-card__steps">
-            <li data-step="1.">Navigate to <code>/login</code></li>
+            <li data-step="1.">Navigate to login screen</li>
             <li data-step="2.">Enter invalid credentials</li>
-            <li data-step="3.">Click Sign In button</li>
+            <li data-step="3.">Submit form</li>
           </ol>
-          <div class="test-card__expected"><strong>Expected:</strong> Error toast appears, remains on login page</div>
+          <div class="test-card__expected"><strong>Expected:</strong> Error message visible, stays on login screen</div>
         </div>
 
         <div class="test-card" data-type="AUTH">
@@ -1019,14 +1019,14 @@ graph LR
             <span class="priority-tag priority-tag--p0">P0</span>
             <span class="test-status test-status--notrun">Not Run</span>
           </div>
-          <div class="test-card__desc">Signup flow creates account and redirects to onboarding</div>
+          <div class="test-card__desc">Signup creates account and redirects to onboarding</div>
           <ol class="test-card__steps">
-            <li data-step="1.">Navigate to <code>/signup</code></li>
-            <li data-step="2.">Fill name, email, password fields</li>
-            <li data-step="3.">Accept terms checkbox</li>
-            <li data-step="4.">Click Create Account</li>
+            <li data-step="1.">Navigate to signup screen</li>
+            <li data-step="2.">Fill required fields</li>
+            <li data-step="3.">Accept terms</li>
+            <li data-step="4.">Submit form</li>
           </ol>
-          <div class="test-card__expected"><strong>Expected:</strong> Redirects to onboarding, welcome message visible</div>
+          <div class="test-card__expected"><strong>Expected:</strong> Redirects to onboarding, welcome content visible</div>
         </div>
 
       </div>
@@ -1049,11 +1049,11 @@ graph LR
             <span class="priority-tag priority-tag--p0">P0</span>
             <span class="test-status test-status--notrun">Not Run</span>
           </div>
-          <div class="test-card__desc">Bottom nav Home tab navigates to home dashboard</div>
+          <div class="test-card__desc">Primary nav tab navigates to main screen</div>
           <ol class="test-card__steps">
-            <li data-step="1.">Click Home icon in bottom nav bar</li>
+            <li data-step="1.">Click first tab in navigation bar</li>
           </ol>
-          <div class="test-card__expected"><strong>Expected:</strong> Home screen loads with KPI cards and quick-action buttons</div>
+          <div class="test-card__expected"><strong>Expected:</strong> Main screen loads with expected heading and key elements</div>
         </div>
 
         <div class="test-card" data-type="NAV">
@@ -1063,11 +1063,11 @@ graph LR
             <span class="priority-tag priority-tag--p0">P0</span>
             <span class="test-status test-status--notrun">Not Run</span>
           </div>
-          <div class="test-card__desc">Bottom nav Workout tab navigates to workout log</div>
+          <div class="test-card__desc">Secondary nav tab navigates to second screen</div>
           <ol class="test-card__steps">
-            <li data-step="1.">Click Workout icon in bottom nav bar</li>
+            <li data-step="1.">Click second tab in navigation bar</li>
           </ol>
-          <div class="test-card__expected"><strong>Expected:</strong> Workout log screen loads with recent workouts list</div>
+          <div class="test-card__expected"><strong>Expected:</strong> Second screen loads with its heading and list content</div>
         </div>
 
         <div class="test-card" data-type="NAV">
@@ -1077,11 +1077,11 @@ graph LR
             <span class="priority-tag priority-tag--p1">P1</span>
             <span class="test-status test-status--notrun">Not Run</span>
           </div>
-          <div class="test-card__desc">Programs card on home navigates to programs library</div>
+          <div class="test-card__desc">Card link on main screen navigates to detail view</div>
           <ol class="test-card__steps">
-            <li data-step="1.">From home, click Programs card</li>
+            <li data-step="1.">From main screen, click a content card</li>
           </ol>
-          <div class="test-card__expected"><strong>Expected:</strong> Programs library loads with program cards grid</div>
+          <div class="test-card__expected"><strong>Expected:</strong> Detail view loads with item content</div>
         </div>
 
       </div>
@@ -1104,12 +1104,12 @@ graph LR
             <span class="priority-tag priority-tag--p1">P1</span>
             <span class="test-status test-status--notrun">Not Run</span>
           </div>
-          <div class="test-card__desc">Home screen renders KPI cards (workouts this week, streak, body weight)</div>
+          <div class="test-card__desc">Main screen renders expected KPI or summary cards</div>
           <ol class="test-card__steps">
-            <li data-step="1.">Navigate to home screen</li>
-            <li data-step="2.">Check for KPI card elements</li>
+            <li data-step="1.">Navigate to main screen</li>
+            <li data-step="2.">Check for summary card elements</li>
           </ol>
-          <div class="test-card__expected"><strong>Expected:</strong> Three KPI cards visible with numeric values and labels</div>
+          <div class="test-card__expected"><strong>Expected:</strong> Summary cards visible with values and labels</div>
         </div>
 
         <div class="test-card" data-type="CMP">
@@ -1119,12 +1119,12 @@ graph LR
             <span class="priority-tag priority-tag--p1">P1</span>
             <span class="test-status test-status--notrun">Not Run</span>
           </div>
-          <div class="test-card__desc">Workout log screen shows exercise list with set/rep/weight columns</div>
+          <div class="test-card__desc">List screen displays items with expected columns</div>
           <ol class="test-card__steps">
-            <li data-step="1.">Navigate to active workout</li>
-            <li data-step="2.">Verify exercise rows with set data</li>
+            <li data-step="1.">Navigate to list screen</li>
+            <li data-step="2.">Verify list rows with data columns</li>
           </ol>
-          <div class="test-card__expected"><strong>Expected:</strong> Each exercise has header and editable set rows</div>
+          <div class="test-card__expected"><strong>Expected:</strong> Each item has header and data fields</div>
         </div>
 
         <div class="test-card" data-type="FRM">
@@ -1134,13 +1134,13 @@ graph LR
             <span class="priority-tag priority-tag--p1">P1</span>
             <span class="test-status test-status--notrun">Not Run</span>
           </div>
-          <div class="test-card__desc">Workout set form validates weight and reps inputs</div>
+          <div class="test-card__desc">Form validates required fields before submission</div>
           <ol class="test-card__steps">
-            <li data-step="1.">Navigate to active workout</li>
-            <li data-step="2.">Submit set with empty weight field</li>
-            <li data-step="3.">Submit set with negative reps</li>
+            <li data-step="1.">Navigate to form screen</li>
+            <li data-step="2.">Submit with empty required field</li>
+            <li data-step="3.">Submit with invalid value</li>
           </ol>
-          <div class="test-card__expected"><strong>Expected:</strong> Validation error shown, set not saved</div>
+          <div class="test-card__expected"><strong>Expected:</strong> Validation error shown, data not saved</div>
         </div>
 
       </div>
@@ -1160,15 +1160,15 @@ graph LR
             <span class="priority-tag priority-tag--p0">P0</span>
             <span class="test-status test-status--notrun">Not Run</span>
           </div>
-          <div class="test-card__desc">Full workout logging flow: login, start workout, log 3 exercises, complete</div>
+          <div class="test-card__desc">Full create flow: login, navigate, create item, complete</div>
           <ol class="test-card__steps">
             <li data-step="1.">Login with test credentials</li>
-            <li data-step="2.">Navigate to Workout tab</li>
-            <li data-step="3.">Tap Start Workout</li>
-            <li data-step="4.">Add 3 exercises with sets</li>
-            <li data-step="5.">Tap Complete Workout</li>
+            <li data-step="2.">Navigate to create screen</li>
+            <li data-step="3.">Start new item</li>
+            <li data-step="4.">Fill in required data</li>
+            <li data-step="5.">Submit and confirm</li>
           </ol>
-          <div class="test-card__expected"><strong>Expected:</strong> Workout saved, summary shown, streak counter incremented</div>
+          <div class="test-card__expected"><strong>Expected:</strong> Item saved, summary shown, counters updated</div>
         </div>
 
         <div class="test-card" data-type="E2E">
@@ -1178,14 +1178,14 @@ graph LR
             <span class="priority-tag priority-tag--p1">P1</span>
             <span class="test-status test-status--notrun">Not Run</span>
           </div>
-          <div class="test-card__desc">Program enrollment: browse programs, select, enroll, see first workout day</div>
+          <div class="test-card__desc">Selection flow: browse list, select item, confirm, see detail</div>
           <ol class="test-card__steps">
-            <li data-step="1.">Navigate to Programs library</li>
-            <li data-step="2.">Tap a program card</li>
-            <li data-step="3.">Tap Start Program</li>
-            <li data-step="4.">Verify enrolled state</li>
+            <li data-step="1.">Navigate to list screen</li>
+            <li data-step="2.">Tap an item card</li>
+            <li data-step="3.">Tap confirm action</li>
+            <li data-step="4.">Verify active state</li>
           </ol>
-          <div class="test-card__expected"><strong>Expected:</strong> Program active, Day 1 exercises shown, progress tracker visible</div>
+          <div class="test-card__expected"><strong>Expected:</strong> Item active, detail content shown, progress visible</div>
         </div>
 
       </div>
@@ -1216,13 +1216,13 @@ graph LR
               <td><code>tests/navigation.spec.ts</code></td>
               <td><span class="test-type-tag" data-type="NAV">NAV</span></td>
               <td class="num">8</td>
-              <td>Bottom nav tabs, screen-to-screen links, back navigation</td>
+              <td>Nav tabs, screen-to-screen links, back navigation</td>
             </tr>
             <tr>
-              <td><code>tests/workout.spec.ts</code></td>
+              <td><code>tests/&lt;domain&gt;.spec.ts</code></td>
               <td><span class="test-type-tag" data-type="CMP">CMP</span> <span class="test-type-tag" data-type="FRM">FRM</span></td>
               <td class="num">10</td>
-              <td>Workout components, set logging forms, validation</td>
+              <td>Domain components, form inputs, validation</td>
             </tr>
             <tr>
               <td><code>tests/accessibility.spec.ts</code></td>
@@ -1240,7 +1240,7 @@ graph LR
               <td><code>tests/e2e.spec.ts</code></td>
               <td><span class="test-type-tag" data-type="E2E">E2E</span></td>
               <td class="num">5</td>
-              <td>Full user journeys: workout flow, program enrollment, onboarding</td>
+              <td>Full user journeys across multiple screens</td>
             </tr>
           </tbody>
         </table>
@@ -1262,12 +1262,12 @@ graph LR
               <td>Shared test fixtures: authenticated page, test user, seed data</td>
             </tr>
             <tr>
-              <td><code>tests/pages/HomePage.ts</code></td>
-              <td>Page Object Model for home dashboard</td>
+              <td><code>tests/pages/MainPage.ts</code></td>
+              <td>Page Object Model for main screen</td>
             </tr>
             <tr>
-              <td><code>tests/pages/WorkoutPage.ts</code></td>
-              <td>Page Object Model for workout logging</td>
+              <td><code>tests/pages/DetailPage.ts</code></td>
+              <td>Page Object Model for detail view</td>
             </tr>
             <tr>
               <td><code>playwright.config.ts</code></td>
@@ -1288,7 +1288,7 @@ graph LR
       </div>
       <div class="callout__body">
         <p>Install dependencies and run the generated Playwright tests:</p>
-        <pre>cd ~/.agent/tests/kewk-fitness
+        <pre>cd ~/.agent/tests/&lt;app-name&gt;
 npm install
 npx playwright install
 npx playwright test
