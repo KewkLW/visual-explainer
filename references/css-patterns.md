@@ -227,9 +227,9 @@ li::before {
 }
 ```
 
-## Mermaid Zoom Controls
+## Mermaid Fullscreen & Zoom
 
-Mermaid diagrams are often too small to read comfortably, especially complex flowcharts and sequence diagrams. Add zoom controls to every `.mermaid-wrap` container.
+Mermaid diagrams are often too small to read comfortably. Use a fullscreen toggle button with free scroll-to-zoom (no Ctrl/Cmd modifier needed). Do NOT use +/- zoom buttons — fullscreen + scroll is cleaner.
 
 ### CSS
 
@@ -250,42 +250,56 @@ Mermaid diagrams are often too small to read comfortably, especially complex flo
 .mermaid-wrap::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
 
 .mermaid-wrap .mermaid {
+  display: flex;
+  justify-content: center;
   transition: transform 0.2s ease;
   transform-origin: top center;
 }
 
-.zoom-controls {
+/* Fullscreen toggle button */
+.fullscreen-btn {
   position: absolute;
   top: 8px;
   right: 8px;
-  display: flex;
-  gap: 2px;
   z-index: 10;
-  background: var(--surface);
+  width: 32px;
+  height: 32px;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 2px;
-}
-
-.zoom-controls button {
-  width: 28px;
-  height: 28px;
-  border: none;
-  background: transparent;
+  background: var(--surface);
   color: var(--text-dim);
-  font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 16px;
   cursor: pointer;
-  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 4px;
   transition: background 0.15s ease, color 0.15s ease;
 }
+.fullscreen-btn:hover { background: var(--border); color: var(--text); }
 
-.zoom-controls button:hover {
-  background: var(--border);
-  color: var(--text);
+/* Fullscreen overlay */
+.mermaid-wrap.is-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  border-radius: 0;
+  border: none;
+  margin: 0;
+  padding: 40px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+}
+.mermaid-wrap.is-fullscreen .fullscreen-btn {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 10001;
+}
+.mermaid-wrap.is-fullscreen .mermaid {
+  transform-origin: center center;
 }
 
 .mermaid-wrap.is-zoomed { cursor: grab; }
@@ -300,11 +314,7 @@ Mermaid diagrams are often too small to read comfortably, especially complex flo
 
 ```html
 <div class="mermaid-wrap">
-  <div class="zoom-controls">
-    <button onclick="zoomDiagram(this, 1.2)" title="Zoom in">+</button>
-    <button onclick="zoomDiagram(this, 0.8)" title="Zoom out">&minus;</button>
-    <button onclick="resetZoom(this)" title="Reset zoom">&#8634;</button>
-  </div>
+  <button class="fullscreen-btn" onclick="toggleFullscreen(this)" title="Toggle fullscreen">&#x26F6;</button>
   <pre class="mermaid">
     graph TD
       A --> B
@@ -314,51 +324,48 @@ Mermaid diagrams are often too small to read comfortably, especially complex flo
 
 ### JavaScript
 
-Add once at the end of the page. Handles button clicks and scroll-to-zoom on all `.mermaid-wrap` containers:
+Add once at the end of the page. Handles fullscreen toggle, free scroll-to-zoom, and drag-to-pan:
 
 ```javascript
-function updateZoomState(wrap) {
-  var target = wrap.querySelector('.mermaid');
-  var zoom = parseFloat(target.dataset.zoom || '1');
-  wrap.classList.toggle('is-zoomed', zoom > 1);
-}
-
-function zoomDiagram(btn, factor) {
+function toggleFullscreen(btn) {
   var wrap = btn.closest('.mermaid-wrap');
   var target = wrap.querySelector('.mermaid');
-  var current = parseFloat(target.dataset.zoom || '1');
-  var next = Math.min(Math.max(current * factor, 0.3), 5);
-  target.dataset.zoom = next;
-  target.style.transform = 'scale(' + next + ')';
-  updateZoomState(wrap);
+  var isFS = wrap.classList.toggle('is-fullscreen');
+  btn.innerHTML = isFS ? '&#x2715;' : '&#x26F6;';
+  btn.title = isFS ? 'Exit fullscreen' : 'Toggle fullscreen';
+  if (!isFS) {
+    target.dataset.zoom = '1';
+    target.style.transform = 'scale(1)';
+    wrap.classList.remove('is-zoomed');
+  }
+  document.body.style.overflow = isFS ? 'hidden' : '';
 }
 
-function resetZoom(btn) {
-  var wrap = btn.closest('.mermaid-wrap');
-  var target = wrap.querySelector('.mermaid');
-  target.dataset.zoom = '1';
-  target.style.transform = 'scale(1)';
-  updateZoomState(wrap);
-}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var fs = document.querySelector('.mermaid-wrap.is-fullscreen');
+    if (fs) toggleFullscreen(fs.querySelector('.fullscreen-btn'));
+  }
+});
 
 document.querySelectorAll('.mermaid-wrap').forEach(function(wrap) {
-  // Ctrl/Cmd + scroll to zoom
+  // Scroll to zoom — no modifier key needed
   wrap.addEventListener('wheel', function(e) {
-    if (!e.ctrlKey && !e.metaKey) return;
     e.preventDefault();
     var target = wrap.querySelector('.mermaid');
     var current = parseFloat(target.dataset.zoom || '1');
-    var factor = e.deltaY < 0 ? 1.1 : 0.9;
-    var next = Math.min(Math.max(current * factor, 0.3), 5);
+    var factor = e.deltaY < 0 ? 1.15 : 0.87;
+    var maxZoom = wrap.classList.contains('is-fullscreen') ? 20 : 8;
+    var next = Math.min(Math.max(current * factor, 0.2), maxZoom);
     target.dataset.zoom = next;
     target.style.transform = 'scale(' + next + ')';
-    updateZoomState(wrap);
+    wrap.classList.toggle('is-zoomed', next > 1);
   }, { passive: false });
 
   // Click-and-drag to pan when zoomed
   var startX, startY, scrollL, scrollT;
   wrap.addEventListener('mousedown', function(e) {
-    if (e.target.closest('.zoom-controls')) return;
+    if (e.target.closest('.fullscreen-btn')) return;
     var target = wrap.querySelector('.mermaid');
     if (parseFloat(target.dataset.zoom || '1') <= 1) return;
     wrap.classList.add('is-panning');
@@ -378,7 +385,7 @@ document.querySelectorAll('.mermaid-wrap').forEach(function(wrap) {
 });
 ```
 
-Scroll-to-zoom requires Ctrl/Cmd+scroll to avoid hijacking normal page scroll. Click-and-drag panning activates only when zoomed in (zoom > 1). Cursor changes to `grab`/`grabbing` to signal the behavior. The zoom range is capped at 0.3x–5x.
+Scroll-to-zoom works directly — no modifier key needed. Fullscreen mode allows up to 20x zoom; inline mode caps at 8x. Click-and-drag panning activates only when zoomed in (zoom > 1). Escape exits fullscreen. Cursor changes to `grab`/`grabbing` to signal pan behavior.
 
 ## Grid Layouts
 
